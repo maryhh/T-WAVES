@@ -1,6 +1,6 @@
-# T-WAES V1.1
+# T-WAVES V1.1
 
-T-WAES V1.1 是面向工业作业的通用具身智能融合模型；技术架构名为 **T-WM-VFLA-S**。
+T-WAVES V1.1 是面向工业作业的通用具身智能融合模型；技术架构名为 **T-WM-VFLA-S**。
 
 - **T**：任务系统、机器人本体与部署工程。
 - **WM**：Goal World Model，用于 Stage2 生成或编码 subgoal image / subgoal latent，辅助策略形成中间目标。
@@ -11,7 +11,7 @@ T-WAES V1.1 是面向工业作业的通用具身智能融合模型；技术架�
 
 ## 1. 数据统一规范
 
-T-WAES 训练时不直接混用原始坐标系。UMI、Ego、真机数据先进入一个中间 episode JSON，再由 `scripts/build_lerobot_dataset.py` 统一写成 LeRobot 数据集。
+T-waves 训练时不直接混用原始坐标系。UMI、Ego、真机数据先进入一个中间 episode JSON，再由 `scripts/build_lerobot_dataset.py` 统一写成 LeRobot 数据集。
 
 ### 1.1 必需字段
 
@@ -92,12 +92,12 @@ action = [delta_xyz, delta_rotvec, delta_gripper]
 示例：
 
 ```bash
-python scripts/prepare_twaes_embodiment_data.py \
+python scripts/prepare_twaves_embodiment_data.py \
   --umi-root /path/to/umi_lerobot_or_processed_data \
   --robot-root /path/to/robot_lerobot_or_processed_data \
   --ego-root /path/to/ego_raw_data \
   --robot-urdf /path/to/configured_robot.urdf \
-  --output data/processed/twaes_stage12_mix \
+  --output data/processed/twaves_stage12_mix \
   --umi-episode 0 \
   --robot-episode 0 \
   --ego-session session_000001 \
@@ -142,7 +142,7 @@ T_world_hand = T_world_camera @ T_camera_hand
 action = inv(T_world_hand_t) @ T_world_hand_t+1
 ```
 
-在 `prepare_twaes_embodiment_data.py` 中，Ego raw 数据默认读取：
+在 `prepare_twaves_embodiment_data.py` 中，Ego raw 数据默认读取：
 
 ```text
 ego_root/session_xxx/slam/pose.csv
@@ -185,12 +185,12 @@ action = inv(T_tcp_current) @ T_tcp_target
 示例：
 
 ```bash
-python scripts/prepare_twaes_embodiment_data.py \
+python scripts/prepare_twaves_embodiment_data.py \
   --umi-root /path/to/umi_data \
   --robot-root /path/to/robot_lerobot_data \
   --ego-root /path/to/ego_data \
   --robot-urdf /path/to/configured_robot.urdf \
-  --output data/processed/twaes_stage12_mix \
+  --output data/processed/twaves_stage12_mix \
   --robot-episode 0 \
   --max-frames 512 \
   --tool-offset-m 0.155
@@ -208,9 +208,9 @@ python scripts/prepare_twaes_embodiment_data.py \
 
 ```bash
 python scripts/build_lerobot_dataset.py \
-  --input-root data/processed/twaes_stage12_mix \
-  --output-root data/lerobot/twaes_stage12_mix \
-  --repo-id local/twaes_stage12_mix \
+  --input-root data/processed/twaves_stage12_mix \
+  --output-root data/lerobot/twaves_stage12_mix \
+  --repo-id local/twaves_stage12_mix \
   --fps 20 \
   --image-size 224 \
   --overwrite
@@ -223,8 +223,8 @@ python - <<'PY'
 from lerobot.datasets.lerobot_dataset import LeRobotDataset
 
 ds = LeRobotDataset(
-    repo_id="local/twaes_stage12_mix",
-    root="data/lerobot/twaes_stage12_mix",
+    repo_id="local/twaves_stage12_mix",
+    root="data/lerobot/twaves_stage12_mix",
 )
 print("frames:", len(ds), "fps:", ds.fps)
 sample = ds[0]
@@ -260,9 +260,9 @@ export CUDA_VISIBLE_DEVICES=0
 
 BASE=checkpoints/foundation_policy/pretrained_model
 TOKENIZER=checkpoints/foundation_tokenizer
-DATA=data/lerobot/twaes_stage12_mix
-REPO=local/twaes_stage12_mix
-OUT=checkpoints/twaes_v1_1/my_run
+DATA=data/lerobot/twaves_stage12_mix
+REPO=local/twaves_stage12_mix
+OUT=checkpoints/twaves_v1_1/my_run
 mkdir -p $OUT
 ```
 
@@ -280,7 +280,7 @@ mkdir -p $OUT
 命令：
 
 ```bash
-$PY scripts/train_twaes_lerobot.py \
+$PY scripts/train_twaves_lerobot.py \
   --stage 1A \
   --dataset-root $DATA \
   --repo-id $REPO \
@@ -315,7 +315,7 @@ Ego：不参与动作 loss，或仅少量用于语义 regularization
 命令：
 
 ```bash
-$PY scripts/train_twaes_lerobot.py \
+$PY scripts/train_twaves_lerobot.py \
   --stage 1B \
   --dataset-root $DATA \
   --repo-id $REPO \
@@ -346,7 +346,7 @@ L_stage1 =
 命令：
 
 ```bash
-$PY scripts/train_twaes_lerobot.py \
+$PY scripts/train_twaves_lerobot.py \
   --stage 1C \
   --dataset-root $DATA \
   --repo-id $REPO \
@@ -388,7 +388,7 @@ Cosmos Goal-WM 示例：
 ```bash
 export TWM_COSMOS_PREDICT2_ROOT=$ROOT/external/cosmos-predict2.5
 
-$PY scripts/train_twaes_lerobot.py \
+$PY scripts/train_twaves_lerobot.py \
   --stage 2 \
   --dataset-root $DATA \
   --repo-id $REPO \
@@ -438,7 +438,7 @@ L_stage3 =
 ```bash
 python scripts/prepare_force_lerobot_data.py \
   --input-root /path/to/force_lerobot_dataset \
-  --output-root data/processed/twaes_stage3_force \
+  --output-root data/processed/twaves_stage3_force \
   --image-size 256 \
   --max-episodes 100 \
   --max-joint-delta-rad 0.35 \
@@ -449,9 +449,9 @@ python scripts/prepare_force_lerobot_data.py \
 
 ```bash
 python scripts/build_lerobot_dataset.py \
-  --input-root data/processed/twaes_stage3_force \
-  --output-root data/lerobot/twaes_stage3_force \
-  --repo-id local/twaes_stage3_force \
+  --input-root data/processed/twaves_stage3_force \
+  --output-root data/lerobot/twaves_stage3_force \
+  --repo-id local/twaves_stage3_force \
   --fps 20 \
   --image-size 224 \
   --overwrite
@@ -460,10 +460,10 @@ python scripts/build_lerobot_dataset.py \
 训练：
 
 ```bash
-$PY scripts/train_twaes_lerobot.py \
+$PY scripts/train_twaves_lerobot.py \
   --stage 3 \
-  --dataset-root data/lerobot/twaes_stage3_force \
-  --repo-id local/twaes_stage3_force \
+  --dataset-root data/lerobot/twaves_stage3_force \
+  --repo-id local/twaves_stage3_force \
   --foundation-checkpoint $BASE \
   --tokenizer $TOKENIZER \
   --init-delta $OUT/stage2.pt \
