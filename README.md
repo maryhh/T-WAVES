@@ -118,10 +118,4 @@ $PY scripts/train_twaes_lerobot.py \
   --goal-wm-steps 1
 ```
 
-## 当前已验证烟测
 
-- LeRobot 数据集：UMI/RealOmin 240 帧 + RoboTwin2 448 帧 + 开源 ego 64 帧。
-- Stage1A：foundation coverage=1.0，输出 `stage1A_realomin_robotwin2_smoke.pt`，推理 `(1,50,16)` 且 finite=True。
-- Stage2：基于 Stage1A delta，真实 Cosmos-Predict2.5 生成 latent，输出 `stage2_realomin_robotwin2_ego_cosmos_smoke.pt`，推理 `(1,50,16)` 且 finite=True。
-
-以上 smoke test 只验证数据、梯度、checkpoint 继承、Cosmos Goal-WM 与推理链路，不代表真实作业成功率。
