@@ -35,38 +35,6 @@ camera_mask = [main, left_wrist, right_wrist]
 
 当前约定：UMI/手持夹爪数据通常是 `[0,1,1]`，ego 视频是 `[1,0,0]`，完整机器人/仿真数据是 `[1,1,1]`。
 
-## 新增数据转换脚本
-
-### GenRobot RealOmin / UMI-like MCAP
-
-```bash
-python scripts/prepare_realomin_mcap_data.py \
-  --input-root data/raw/modelscope_10kh_realomin_sample \
-  --output-root data/processed/realomin_stage1_sample \
-  --max-files 5 --max-frames-per-file 48 --stride 10 --image-size 256
-```
-
-### RoboTwin2.0 HDF5
-
-RoboTwin2.0 的左右 `endpose` 会被转换成和 UMI 一致的双臂 TCP-local delta，而不是直接混用 joint action。
-
-```bash
-python scripts/prepare_robotwin2_hdf5_data.py \
-  --input-root data/raw/robotwin2_sample \
-  --output-root data/processed/robotwin2_stage1_sample \
-  --max-episodes 20 --max-frames-per-episode 32 --stride 2 --image-size 256
-```
-
-### 开源 Ego 视频
-
-普通 ego 视频没有机器人动作，只用于 Stage2 的 goal/subtask 语义监督。
-
-```bash
-python scripts/prepare_ego_video_data.py \
-  --input-root data/hf/ego_pov_sample \
-  --output-root data/processed/ego_open_stage2_sample \
-  --max-videos 1 --max-frames-per-video 64 --stride 12 --image-size 256
-```
 
 ### 合成 LeRobot 数据集
 
